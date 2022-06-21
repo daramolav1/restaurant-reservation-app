@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
+import { Link } from "react-router-dom";
+import { previous, today, next } from "../utils/date-time";
+import Reservations from "./Reservations";
 
 /**
  * Defines the dashboard page.
@@ -8,6 +11,7 @@ import ErrorAlert from "../layout/ErrorAlert";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
+
 function Dashboard({ date }) {
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
@@ -26,11 +30,35 @@ function Dashboard({ date }) {
   return (
     <main>
       <h1>Dashboard</h1>
-      <div className="d-md-flex mb-3">
-        <h4 className="mb-0">Reservations for date</h4>
+      <div className="row">
+        <div className="col-md-6 col-lg-6 col-sm-12">
+          <div className="d-md-flex mb-3">
+            <h4 className="mb-0">Reservations for {date}</h4>
+          </div>
+          <ErrorAlert error={reservationsError} />
+          <div className="btn-group" role="group" aria-label="Group for dates">
+            <Link
+              to={`/dashboard?date=${previous(date)}`}
+              className="btn btn-secondary"
+            >
+              <span className="oi oi-chevron-left" /> Previous
+            </Link>
+            <Link
+              to={`/dashboard?date=${today()}`}
+              className="btn btn-secondary"
+            >
+              Today
+            </Link>
+            <Link
+              to={`/dashboard?date=${next(date)}`}
+              className="btn btn-secondary"
+            >
+              Next <span className="oi oi-chevron-right" />
+            </Link>
+          </div>
+          <Reservations reservations={reservations} />
+        </div>
       </div>
-      <ErrorAlert error={reservationsError} />
-      {JSON.stringify(reservations)}
     </main>
   );
 }
