@@ -129,6 +129,11 @@ async function seat(req, res) {
   res.json({ data });
 }
 
+async function finish(req, res) {
+  const data = await tablesService.finish(res.locals.table);
+  res.json({ data });
+}
+
 module.exports = {
   list: asyncErrorBoundary(list),
   create: [
@@ -146,4 +151,5 @@ module.exports = {
     isBooked,
     asyncErrorBoundary(seat),
   ],
+  finish: [tableExists, ifTableOccupied, asyncErrorBoundary(finish)],
 };

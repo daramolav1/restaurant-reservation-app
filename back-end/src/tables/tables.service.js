@@ -30,9 +30,25 @@ function seat(table_id, reservation_id) {
   });
 }
 
+function finish(table) {
+  return knex.transaction(async (transaction) => {
+    await knex("reservations")
+      .where({ reservation_id: table.reservation_id })
+      .update({ status: "finished" })
+      .transacting(transaction);
+
+    return knex("tables")
+      .where({ table_id: table.table_id })
+      .update({ reservation_id: null }, "*")
+      .transacting(transaction)
+      .then((finishedRecords) => finishedRecords[0]);
+  });
+}
+
 module.exports = {
   list,
   create,
   read,
   seat,
+  finish,
 };
