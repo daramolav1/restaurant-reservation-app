@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import ReservationForm from "./ReservationForm";
-import ErrorAlert from "../layout/ErrorAlert";
+import ReservationErrors from "./ReservationErrors";
 import { createReservation } from "../utils/api";
 
 function ReservationCreate() {
@@ -26,8 +26,12 @@ function ReservationCreate() {
   return (
     <main>
       <h1>Create Reservation</h1>
-      <ErrorAlert error={error} />
-      <ReservationForm onSubmit={submitHandler} onCancel={cancelHandler} />
+      <ReservationErrors errors={error} />
+      <ReservationForm
+        onSubmit={submitHandler}
+        onCancel={cancelHandler}
+        setError={setError}
+      />
     </main>
   );
 }

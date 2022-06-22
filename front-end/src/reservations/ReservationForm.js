@@ -1,18 +1,55 @@
 import React, { useState } from "react";
 
-function ReservationForm({
-  onSubmit,
-  onCancel,
-  initialState = {
+function ReservationForm({ onSubmit, onCancel, setError }) {
+  const initialState = {
     first_name: "",
     last_name: "",
     mobile_number: "",
     reservation_date: "",
     reservation_time: "",
     people: "",
-  },
-}) {
+  };
+
   const [reservation, setReservation] = useState(initialState);
+
+  function validate(reservation) {
+    const errors = [];
+
+    function isFutureDate({ reservation_date, reservation_time }) {
+      const slot = new Date(`${reservation_date}T${reservation_time}`);
+      if (slot < new Date()) {
+        errors.push(
+          new Error("Reservation date/time must occur in the future")
+        );
+      }
+    }
+
+    function isTuesday({ reservation_date }) {
+      const day = new Date(reservation_date).getUTCDay();
+      if (day === 2) {
+        errors.push(new Error("The restaurant is closed on Tuesday"));
+      }
+    }
+
+    function isOpenHours({ reservation_time }) {
+      const hour = parseInt(reservation_time.split(":")[0]);
+      const mins = parseInt(reservation_time.split(":")[1]);
+
+      if (hour <= 10 && mins <= 30) {
+        errors.push(new Error("Please select a time after 10:30 am"));
+      }
+
+      if (hour >= 22) {
+        errors.push(new Error("Please select a time before 10:00 pm"));
+      }
+    }
+
+    isFutureDate(reservation);
+    isTuesday(reservation);
+    isOpenHours(reservation);
+
+    return errors;
+  }
 
   function changeHandler(e) {
     const value =
@@ -25,6 +62,14 @@ function ReservationForm({
 
   function submitHandler(e) {
     e.preventDefault();
+    e.stopPropagation();
+
+    const reservationErrors = validate(reservation);
+
+    if (reservationErrors.length) {
+      return setError(reservationErrors);
+    }
+
     onSubmit(reservation);
   }
 
