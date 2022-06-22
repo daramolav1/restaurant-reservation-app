@@ -155,6 +155,19 @@ async function reservationExists(req, res, next) {
   });
 }
 
+async function confirmReservation(req, res, next) {
+  const reservation = await reservationsService.read(req.params.reservation_id);
+
+  if (reservation) {
+    res.locals.reservation = reservation;
+    return next();
+  }
+  next({
+    status: 404,
+    message: `reservation_id ${res.locals.reservation_id} cannot be found.`,
+  });
+}
+
 async function list(req, res) {
   const mobile_number = req.query.mobile_number;
   const data = await (mobile_number
@@ -179,6 +192,13 @@ async function status(req, res) {
   res.json({ data });
 }
 
+async function update(req, res) {
+  const { reservation_id } = res.locals.reservation;
+  req.body.data.reservation_id = reservation_id;
+  const data = await reservationsService.status(req.body.data);
+  res.json({ data });
+}
+
 module.exports = {
   list: asyncErrorBoundary(list),
   create: [
@@ -191,12 +211,22 @@ module.exports = {
     checkStatus,
     asyncErrorBoundary(create),
   ],
-  read: [hasReservationId, reservationExists, asyncErrorBoundary(read)],
-  reservationExists: [hasReservationId, reservationExists],
+  read: [hasReservationId, asyncErrorBoundary(reservationExists), read],
+  reservationExists: [hasReservationId, asyncErrorBoundary(reservationExists)],
   status: [
     hasReservationId,
-    reservationExists,
+    asyncErrorBoundary(reservationExists),
     unfinishedStatus,
     asyncErrorBoundary(status),
+  ],
+  update: [
+    hasOnlyValidProperties,
+    hasRequiredProperties,
+    hasValidDate,
+    hasValidTime,
+    hasValidNumberOfPeople,
+    checkStatus,
+    asyncErrorBoundary(confirmReservation),
+    asyncErrorBoundary(update),
   ],
 };
