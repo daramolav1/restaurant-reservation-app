@@ -143,13 +143,17 @@ module.exports = {
     ifCapacityNAN,
     asyncErrorBoundary(create),
   ],
-  read: [tableExists, asyncErrorBoundary(read)],
+  read: [asyncErrorBoundary(tableExists), asyncErrorBoundary(read)],
   seat: [
-    tableExists,
+    asyncErrorBoundary(tableExists),
     ifTableHasCapacity,
     ifTableNotOccupied,
     isBooked,
     asyncErrorBoundary(seat),
   ],
-  finish: [tableExists, ifTableOccupied, asyncErrorBoundary(finish)],
+  finish: [
+    asyncErrorBoundary(tableExists),
+    ifTableOccupied,
+    asyncErrorBoundary(finish),
+  ],
 };
