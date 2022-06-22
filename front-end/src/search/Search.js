@@ -18,10 +18,12 @@ function Search() {
   }
 
   function search() {
+    const abortController = new AbortController();
     setShowResults(false);
     listReservations({ mobile_number: mobileNumber })
       .then(setReservations)
       .then(() => setShowResults(true));
+    return () => abortController.abort();
   }
 
   return (
