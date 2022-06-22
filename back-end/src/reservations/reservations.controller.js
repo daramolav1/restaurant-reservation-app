@@ -92,6 +92,21 @@ function hasValidNumberOfPeople(req, res, next) {
   next();
 }
 
+function hasEligibleTime(req, res, next) {
+  const { data: { reservation_date, reservation_time } = {} } = req.body;
+
+  const date = new Date(`${reservation_date}, ${reservation_time}`);
+  const minutes = date.getHours() * 60 + date.getMinutes();
+
+  if (minutes < 630 || minutes > 1290) {
+    return next({
+      status: 400,
+      message: `Please select a time between 10:30 and 21:30`,
+    });
+  }
+  next();
+}
+
 function hasReservationId(req, res, next) {
   const reservation =
     req.params.reservation_id || req.body?.data?.reservation_id;
@@ -156,6 +171,7 @@ module.exports = {
     hasValidDate,
     hasValidTime,
     hasValidNumberOfPeople,
+    hasEligibleTime,
     checkStatus,
     asyncErrorBoundary(create),
   ],
