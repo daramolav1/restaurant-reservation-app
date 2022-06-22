@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { listReservations, listTables } from "../utils/api";
+import { listReservations, listTables, finishTable } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { Link } from "react-router-dom";
 import { previous, today, next } from "../utils/date-time";
@@ -30,6 +30,10 @@ function Dashboard({ date }) {
     setTablesError(null);
     listTables().then(setTables).catch(setTablesError);
     return () => abortController.abort();
+  }
+
+  function onFinish(table_id) {
+    finishTable(table_id).then(loadDashboard).catch(setTablesError);
   }
 
   return (
@@ -66,7 +70,7 @@ function Dashboard({ date }) {
 
         <div className="col-md-6 col-lg-6 col-sm-12">
           <ErrorAlert error={tablesError} />
-          <Tables tables={tables} />
+          <Tables tables={tables} onFinish={onFinish} />
         </div>
       </div>
     </main>

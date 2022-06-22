@@ -1,6 +1,15 @@
 import React from "react";
 
-function Tables({ tables }) {
+function Tables({ onFinish, tables }) {
+  function finishHandler({ target: { dataset: { tableIdFinish } } = {} }) {
+    const confirmed = window.confirm(
+      "Is this table ready to seat new guests?\n\nThis cannot be undone."
+    );
+    if (confirmed) {
+      onFinish(tableIdFinish);
+    }
+  }
+
   const tablesList = tables
     .sort((a, b) => (a.table_name > b.table_name ? 1 : -1))
     .map((table) => {
@@ -11,6 +20,20 @@ function Tables({ tables }) {
           <td>{table.capacity}</td>
           <td data-table-id-status={table.table_id}>
             {table.reservation_id ? "Occupied" : "Free"}
+          </td>
+          <td>
+            {table.reservation_id ? (
+              <button
+                className="btn btn-outline-secondary"
+                type="button"
+                data-table-id-finish={table.table_id}
+                onClick={finishHandler}
+              >
+                Finish
+              </button>
+            ) : (
+              ""
+            )}
           </td>
         </tr>
       );
