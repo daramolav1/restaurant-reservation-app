@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { listReservations, listTables, finishTable } from "../utils/api";
+import {
+  listReservations,
+  listTables,
+  finishTable,
+  cancelReservation,
+} from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { Link } from "react-router-dom";
 import { previous, today, next } from "../utils/date-time";
@@ -36,6 +41,12 @@ function Dashboard({ date }) {
     finishTable(table_id).then(loadDashboard).catch(setTablesError);
   }
 
+  function onCancel(reservation_id) {
+    cancelReservation(reservation_id)
+      .then(loadDashboard)
+      .catch(setReservationsError);
+  }
+
   return (
     <main>
       <h1>Dashboard</h1>
@@ -65,7 +76,7 @@ function Dashboard({ date }) {
               Next <span className="oi oi-chevron-right" />
             </Link>
           </div>
-          <Reservations reservations={reservations} />
+          <Reservations reservations={reservations} onCancel={onCancel} />
         </div>
 
         <div className="col-md-6 col-lg-6 col-sm-12">
