@@ -176,4 +176,5 @@ module.exports = {
     asyncErrorBoundary(create),
   ],
   read: [hasReservationId, reservationExists, asyncErrorBoundary(read)],
+  reservationExists: [hasReservationId, reservationExists],
 };
