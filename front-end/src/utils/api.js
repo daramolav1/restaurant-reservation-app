@@ -1,4 +1,4 @@
-/**
+/*
  * Defines the base URL for the API.
  * The default values is overridden by the `API_BASE_URL` environment variable.
  */
@@ -84,6 +84,46 @@ export async function readReservation(reservationId, signal) {
   return await fetchJson(url, { headers, signal }, [])
     .then(formatReservationDate)
     .then(formatReservationTime);
+}
+
+export async function updateReservation(reservation, signal) {
+  const { reservation_date, reservation_time, reservation_id } = reservation;
+  const url = `${API_BASE_URL}/reservations/${reservation_id}`;
+
+  const data = {
+    ...reservation,
+    reservation_date: Array.isArray(reservation_date)
+      ? reservation_date[0]
+      : reservation_date,
+    reservation_time: Array.isArray(reservation_time)
+      ? reservation_time[0]
+      : reservation_time,
+  };
+
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ data }),
+    signal,
+  };
+  const response = await fetchJson(url, options, reservation);
+
+  return Array.isArray(response) ? response[0] : response;
+}
+
+export async function cancelReservation(reservationId, signal) {
+  const url = `${API_BASE_URL}/reservations/${reservationId}/status`;
+  const options = {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({
+      data: {
+        status: "cancelled",
+      },
+    }),
+    signal,
+  };
+  return await fetchJson(url, options, {});
 }
 
 export async function listTables(signal) {
