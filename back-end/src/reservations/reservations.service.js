@@ -19,8 +19,32 @@ function read(reservation_id) {
   return knex("reservations").select("*").where({ reservation_id }).first();
 }
 
+function update(reservation) {
+  return knex("reservations")
+    .where({ reservation_id: reservation.reservation_id })
+    .update(reservation, "*")
+    .then((updatedRecords) => updatedRecords[0]);
+}
+
+function status(reservation) {
+  update(reservation);
+  return validStatus(reservation);
+}
+
+function validStatus(reservation) {
+  if (
+    ["booked", "seated", "finished", "cancelled"].includes(reservation.status)
+  ) {
+    return reservation;
+  }
+  const error = new Error(`Invalid status:"${reservation.status}"`);
+  error.status = 400;
+  throw error;
+}
+
 module.exports = {
   list,
   create,
   read,
+  status,
 };

@@ -132,6 +132,16 @@ function checkStatus(req, res, next) {
   next();
 }
 
+function unfinishedStatus(req, res, next) {
+  if ("booked" !== res.locals.reservation.status) {
+    return next({
+      status: 400,
+      message: `Reservation status: '${res.locals.reservation.status}'.`,
+    });
+  }
+  next();
+}
+
 async function reservationExists(req, res, next) {
   const reservation = await reservationsService.read(res.locals.reservation_id);
 
@@ -163,6 +173,12 @@ function read(req, res) {
   res.status(200).json({ data });
 }
 
+async function status(req, res) {
+  res.locals.reservation.status = req.body.data.status;
+  const data = await reservationsService.status(res.locals.reservation);
+  res.json({ data });
+}
+
 module.exports = {
   list: asyncErrorBoundary(list),
   create: [
@@ -177,4 +193,10 @@ module.exports = {
   ],
   read: [hasReservationId, reservationExists, asyncErrorBoundary(read)],
   reservationExists: [hasReservationId, reservationExists],
+  status: [
+    hasReservationId,
+    reservationExists,
+    unfinishedStatus,
+    asyncErrorBoundary(status),
+  ],
 };
