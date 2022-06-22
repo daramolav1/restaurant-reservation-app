@@ -1,6 +1,17 @@
 import React from "react";
 
-function Reservations({ reservations }) {
+function Reservations({ onCancel, reservations }) {
+  function cancelHandler({
+    target: { dataset: { reservationIdCancel } } = {},
+  }) {
+    const confirmed = window.confirm(
+      "Do you want to cancel this reservation?\n\nThis cannot be undone."
+    );
+    if (confirmed) {
+      onCancel(reservationIdCancel);
+    }
+  }
+
   const reservationsList = reservations
     .sort((a, b) => (a.reservation_time > b.reservation_time ? 1 : -1))
     .map((reservation) => {
@@ -26,6 +37,25 @@ function Reservations({ reservations }) {
                 >
                   Seat
                 </a>
+              </td>
+
+              <td>
+                <a
+                  className="btn btn-secondary"
+                  href={`/reservations/${reservation.reservation_id}/edit`}
+                >
+                  Edit
+                </a>
+              </td>
+
+              <td>
+                <button
+                  className="btn btn-secondary"
+                  data-reservation-id-cancel={reservation.reservation_id}
+                  onClick={cancelHandler}
+                >
+                  Cancel
+                </button>
               </td>
             </>
           ) : (
