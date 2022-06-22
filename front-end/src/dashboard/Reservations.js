@@ -17,6 +17,20 @@ function Reservations({ reservations }) {
           <td data-reservation-id-status={reservation.reservation_id}>
             {reservation.status}
           </td>
+          {reservation.status === "booked" ? (
+            <>
+              <td>
+                <a
+                  className="btn btn-secondary"
+                  href={`/reservations/${reservation.reservation_id}/seat`}
+                >
+                  Seat
+                </a>
+              </td>
+            </>
+          ) : (
+            <td></td>
+          )}
         </tr>
       );
     });
