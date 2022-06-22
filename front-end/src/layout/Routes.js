@@ -9,6 +9,7 @@ import ReservationCreate from "../reservations/ReservationCreate";
 import TableCreate from "../tables/TableCreate";
 import ReservationSeating from "../reservations/ReservationSeating";
 import Search from "../search/Search";
+import ReservationEdit from "../reservations/ReservationEdit";
 
 /**
  * Defines all the routes for the application.
@@ -29,6 +30,9 @@ function Routes() {
       <Route exact={true} path="/reservations">
         <Redirect to={"/dashboard"} />
       </Route>
+      <Route exact={true} path="/tables">
+        <Redirect to={"/dashboard"} />
+      </Route>
       <Route path="/dashboard">
         <Dashboard date={date ? date : today()} />
       </Route>
@@ -43,6 +47,9 @@ function Routes() {
       </Route>
       <Route path="/search">
         <Search />
+      </Route>
+      <Route path="/reservations/:reservation_id/edit">
+        <ReservationEdit />
       </Route>
       <Route>
         <NotFound />
