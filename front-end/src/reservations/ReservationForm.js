@@ -1,6 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { readReservation } from "../utils/api";
 
 function ReservationForm({ onSubmit, onCancel, setError }) {
+  const { reservation_id } = useParams();
+
   const initialState = {
     first_name: "",
     last_name: "",
@@ -11,6 +15,16 @@ function ReservationForm({ onSubmit, onCancel, setError }) {
   };
 
   const [reservation, setReservation] = useState(initialState);
+
+  useEffect(loadReservation, [reservation_id]);
+
+  function loadReservation() {
+    const abortController = new AbortController();
+    if (reservation_id) {
+      readReservation(reservation_id).then(setReservation);
+    }
+    return () => abortController.abort();
+  }
 
   function validate(reservation) {
     const errors = [];
