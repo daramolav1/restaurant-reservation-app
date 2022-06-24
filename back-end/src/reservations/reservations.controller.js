@@ -41,25 +41,11 @@ function hasOnlyValidProperties(req, res, next) {
 
 function hasValidDate(req, res, next) {
   const { data: { reservation_date } = {} } = req.body;
-  const date = new Date(reservation_date);
-  const day = date.getUTCDay();
 
-  if (isNaN(Date.parse(reservation_date))) {
+  if (!reservation_date.match(/\d{4}-\d{2}-\d{2}/)) {
     return next({
       status: 400,
       message: `Invalid reservation_date`,
-    });
-  }
-  if (day === 2) {
-    return next({
-      status: 400,
-      message: `Restaurant is closed on Tuesdays`,
-    });
-  }
-  if (date < new Date()) {
-    return next({
-      status: 400,
-      message: `Reservation must be set in the future`,
     });
   }
   next();
@@ -68,16 +54,13 @@ function hasValidDate(req, res, next) {
 function hasValidTime(req, res, next) {
   const { data: { reservation_time } = {} } = req.body;
 
-  if (
-    /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(reservation_time) ||
-    /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/.test(reservation_time)
-  ) {
-    return next();
+  if (!reservation_time.match(/[0-9]{2}:[0-9]{2}/)) {
+    return next({
+      status: 400,
+      message: `Invalid reservation_time`,
+    });
   }
-  next({
-    status: 400,
-    message: `Invalid reservation_time`,
-  });
+  next();
 }
 
 function hasValidNumberOfPeople(req, res, next) {
@@ -94,14 +77,29 @@ function hasValidNumberOfPeople(req, res, next) {
 
 function hasEligibleTime(req, res, next) {
   const { data: { reservation_date, reservation_time } = {} } = req.body;
+  const time = reservation_time.replace(":", "");
 
-  const date = new Date(`${reservation_date}, ${reservation_time}`);
-  const minutes = date.getHours() * 60 + date.getMinutes();
-
-  if (minutes < 630 || minutes > 1290) {
-    return next({
+  if (new Date(reservation_date).getDay() + 1 === 2) {
+    next({
       status: 400,
-      message: `Please select a time between 10:30 and 21:30`,
+      message: `The reservation date is a Tuesday as the restaurant is closed on Tuesdays.`,
+    });
+  } else if (
+    Date.parse(reservation_date + ":" + reservation_time) < Date.now()
+  ) {
+    next({
+      status: 400,
+      message: `The reservation date is in the past. Only future reservations are allowed.`,
+    });
+  } else if (time < 1030) {
+    next({
+      status: 400,
+      message: `The reservation time is before 10:30 AM.`,
+    });
+  } else if (time > 2130) {
+    next({
+      status: 400,
+      message: `The reservation time is after 9:30 PM, because the restaurant closes at 10:30 PM and the customer needs to have time to enjoy their meal.`,
     });
   }
   next();
@@ -117,7 +115,7 @@ function hasReservationId(req, res, next) {
   }
   next({
     status: 400,
-    message: `missing reservation_id`,
+    message: `Missing reservation_id`,
   });
 }
 

@@ -11,6 +11,7 @@ function ReservationCreate() {
 
   function submitHandler(reservation) {
     const abortController = new AbortController();
+    setError(null);
     createReservation(reservation, abortController.signal)
       .then(() =>
         history.push(`/dashboard?date=${reservation.reservation_date}`)

@@ -42,9 +42,11 @@ function Dashboard({ date }) {
   }
 
   function onCancel(reservation_id) {
-    cancelReservation(reservation_id)
+    const abortController = new AbortController();
+    cancelReservation(reservation_id, abortController.signal)
       .then(loadDashboard)
       .catch(setReservationsError);
+    return () => abortController.abort();
   }
 
   return (
