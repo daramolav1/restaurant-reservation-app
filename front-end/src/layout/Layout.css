@@ -1,4 +1,12 @@
+.project-container {
+  min-height: 100vh;
+}
+
 .side-bar {
-  background-color: #393a44;
+  background-color: #5b8e7d;
   min-width: 200px;
+}
+
+.sidebar-brand-text {
+  font-size: 30px;
 }
